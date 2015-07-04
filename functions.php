@@ -21,3 +21,28 @@ function wpt_theme_styles() {
  wp_enqueue_style( 'main_css', get_template_directory_uri() . '/style.css' );
 }
 add_action( 'wp_enqueue_scripts', 'wpt_theme_styles' );
+
+// If we look at our static index.html, we can see modernizer, bootstrap, jquery, foundation, and app.js
+// To port these js files, 
+// first copy them into our theme - but skip jQ as WP comes with it preinstalled, and a special method if you're including JS that is dependent of jQuery
+// So first copy files, and this is commit with asdfasd treeish
+// Then in functions.php:
+// very similar to wp_enqueue_style is the wp_enqueue_script()
+// they both use the same 1st parameter, we'll also use get_template_directory_uri() and concatenate the relative path
+// however, enqueue script takes additional parameters, the 3rd param is an array of dependencies, and for modernizer we'll leave it blank
+// the 4th param is if we want to set the version for this, which we don't so this one is empty too
+// the 5th param checks if the code goes in the header of footer. FALSE=header, TRUE=footer
+// now let's add foundation
+// since foundation is dependent on jquery, we'll pass it the array with jQuery, which will ensure to load jQuery before it loads foundation.js
+// note that you can also make files dependent not only on jQuery but on each other
+// the last param is true (display at bottom)
+// now let's add main_js hook, and this one is dependent on both jquery and foundation.js, so we'll add both to the dependencies array
+// and finally, say, "WordPress, when it's time for you to enqueue scripts, make sure to enqueue scripts listed in thw wpt_theme_js() custom function
+
+function wpt_theme_js() {
+  wp_enqueue_script( 'modernizr_js', get_template_directory_uri(). '/js/modernizr.js', '', '', false );
+  wp_enqueue_script( 'foundation_js', get_template_directory_uri(). '/js/foundation.js', array('jquery'), '', true );
+  wp_enqueue_script( 'main_js', get_template_directory_uri() . '/js/app.js', arry('jquery', 'foundation_js'), '', true );
+}
+add_action( 'wp_enqueue_scripts', 'wpt_theme_js' );
+
